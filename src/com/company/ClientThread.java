@@ -69,11 +69,6 @@ public class ClientThread extends Thread {
             for (Note note : notes) {
                 note.write(outputStream);
             }
-            /*FileWriter writer = new FileWriter("Notes.txt");
-            for (Note note : notes) {
-                writer.write(note.text);
-            }
-            writer.close();*/
         } catch (IOException | EndOfStream e) {
             e.printStackTrace();
         }
@@ -97,13 +92,6 @@ public class ClientThread extends Thread {
             for (Note note : notes) {
                 note.write(outputStream);
             }
-            /*try (BufferedReader br = new BufferedReader(new FileReader("Notes.txt"))) {
-            String line = br.readLine();
-            ArrayList<Note> notes = new ArrayList<Note>();
-            while (line != null) {
-                notes.add(new Note(line));
-                line = br.readLine();
-            }*/
 
         } catch (Exception e) {
             e.printStackTrace();
