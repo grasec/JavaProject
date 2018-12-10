@@ -6,8 +6,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class ClientThread extends Thread {
-    public static final int ACTION1 = 100;
-    public static final int ACTION2 = 101;
+    public static final int ACTION1 = 101;
+    public static final int ACTION2 = 100;
 
     private Socket socket;
     private InputStream inputStream;
@@ -63,11 +63,17 @@ public class ClientThread extends Thread {
             int arrayLength = ByteBuffer.wrap(arraySize).getInt();
             while (notes.size() != arrayLength)
                 notes.add(new Note(inputStream));
-            FileWriter writer = new FileWriter("Notes.txt");
+            File file = new File("Notes.txt");
+            OutputStream outputStream = new FileOutputStream(file);
+            outputStream.write(notes.size());
+            for (Note note : notes) {
+                note.write(outputStream);
+            }
+            /*FileWriter writer = new FileWriter("Notes.txt");
             for (Note note : notes) {
                 writer.write(note.text);
             }
-            writer.close();
+            writer.close();*/
         } catch (IOException | EndOfStream e) {
             e.printStackTrace();
         }
@@ -77,20 +83,28 @@ public class ClientThread extends Thread {
 
     private static void sendNotesToClient(OutputStream outputStream) {
         try {
-            try (BufferedReader br = new BufferedReader(new FileReader("Notes.txt"))) {
-                String line = br.readLine();
-                ArrayList<Note> notes = new ArrayList<Note>();
-                while (line != null) {
-                    notes.add(new Note(line));
-                    line = br.readLine();
-                }
-                byte[] arraySize = new byte[4];
-                ByteBuffer.wrap(arraySize).putInt(notes.size());
-                outputStream.write(arraySize);
-                for (Note note : notes) {
-                    note.write(outputStream);
-                }
+            File file = new File("Notes.txt");
+            InputStream inputStream = new FileInputStream(file);
+            int notesArraySize = inputStream.read();
+            ArrayList<Note> notes = new ArrayList<>();
+            for (int i = 0; i < notesArraySize; i++) {
+                Note note = new Note(inputStream);
+                notes.add(note);
             }
+            byte[] arraySize = new byte[4];
+            ByteBuffer.wrap(arraySize).putInt(notes.size());
+            outputStream.write(arraySize);
+            for (Note note : notes) {
+                note.write(outputStream);
+            }
+            /*try (BufferedReader br = new BufferedReader(new FileReader("Notes.txt"))) {
+            String line = br.readLine();
+            ArrayList<Note> notes = new ArrayList<Note>();
+            while (line != null) {
+                notes.add(new Note(line));
+                line = br.readLine();
+            }*/
+
         } catch (Exception e) {
             e.printStackTrace();
         }
